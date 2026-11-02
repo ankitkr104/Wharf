@@ -544,12 +544,12 @@ export const ReadmePreview = ({
               content={content}
               variant="toolbar"
               label="Copy"
-              tooltipPosition="top"
+              showTooltip={false}
             />
 
             <button
               onClick={handleDownload}
-              className="p-1.5 border-2 border-wharf-border-primary bg-wharf-surface-primary hover:bg-wharf-surface-secondary transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="p-1.5 border-2 border-wharf-border-primary bg-wharf-surface-primary hover:bg-wharf-surface-secondary transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-1.5 cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span className="font-mono text-[10px] font-bold hidden sm:inline">Download</span>
@@ -557,7 +557,7 @@ export const ReadmePreview = ({
 
             <button
               onClick={handleFullscreenToggle}
-              className="p-1.5 border-2 border-wharf-border-primary bg-wharf-surface-primary hover:bg-wharf-surface-secondary transition-colors cursor-pointer"
+              className="p-1.5 border-2 border-wharf-border-primary bg-wharf-surface-primary hover:bg-wharf-surface-secondary transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>

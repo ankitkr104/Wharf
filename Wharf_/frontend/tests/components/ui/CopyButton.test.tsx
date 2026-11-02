@@ -47,7 +47,10 @@ describe('CopyButton', () => {
     });
 
     // Tooltip confirmation
-    expect(screen.getByTestId('copy-tooltip')).toHaveTextContent('Copied to clipboard!');
+    const tooltip = screen.getByTestId('copy-tooltip');
+    expect(tooltip).toHaveTextContent('Copied to clipboard!');
+    // Verify no pulsing indicator beside text
+    expect(tooltip.querySelector('.animate-pulse')).toBeNull();
 
     // Screen reader accessible announcement
     const liveRegion = document.querySelector('[aria-live="polite"]');
@@ -73,7 +76,7 @@ describe('CopyButton', () => {
     expect(screen.queryByText('Copied!')).not.toBeInTheDocument();
   });
 
-  it('supports codeblock and toolbar variants', () => {
+  it('supports codeblock and toolbar variants and hides tooltip on toolbar', async () => {
     const { rerender } = render(<CopyButton content="code snippet" variant="codeblock" />);
     let button = screen.getByRole('button');
     expect(button.className).toContain('opacity-90');
@@ -81,6 +84,13 @@ describe('CopyButton', () => {
     rerender(<CopyButton content="markdown" variant="toolbar" label="Copy" />);
     button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(button);
+    });
+
+    // Toolbar variant should not render floating tooltip to prevent container overflow artifacts
+    expect(screen.queryByTestId('copy-tooltip')).not.toBeInTheDocument();
   });
 
   it('triggers onCopy callback when provided', async () => {

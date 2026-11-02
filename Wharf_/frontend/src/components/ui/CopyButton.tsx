@@ -28,6 +28,8 @@ export interface CopyButtonProps
   className?: string;
   /** Whether to show the text label alongside the icon */
   showLabel?: boolean;
+  /** Whether to show the confirmation tooltip (defaults to false for toolbar variant, true for others) */
+  showTooltip?: boolean;
 }
 
 export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
@@ -43,6 +45,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       tooltipPosition = 'top',
       className,
       showLabel = true,
+      showTooltip,
       onClick,
       disabled,
       ...props
@@ -51,6 +54,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
   ) => {
     const [copied, setCopied] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const shouldShowTooltip = showTooltip ?? (variant !== 'toolbar');
 
     // Clean up timeout on unmount
     useEffect(() => {
@@ -136,9 +140,10 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
             : 'btn-primary';
 
         return cn(
-          'btn btn-sm relative group transition-all duration-200 select-none cursor-pointer',
+          'btn btn-sm rounded-md relative group transition-all duration-200 select-none cursor-pointer',
+          'hover:scale-[1.02] active:scale-[0.98]',
           copied
-            ? 'bg-wharf-green text-black border-2 border-wharf-border-primary shadow-brutal-sm hover:bg-wharf-green-dark'
+            ? 'btn-success !bg-wharf-green text-black border-2 border-wharf-border-primary shadow-brutal-sm hover:!bg-wharf-green-dark'
             : idleBg,
           className
         );
@@ -147,8 +152,9 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       if (variant === 'toolbar') {
         return cn(
           'p-1.5 border-2 border-wharf-border-primary flex items-center gap-1.5 select-none cursor-pointer transition-all duration-200',
+          'hover:scale-[1.02] active:scale-[0.98]',
           copied
-            ? 'bg-wharf-green text-black shadow-brutal-sm'
+            ? 'btn-success !bg-wharf-green text-black shadow-brutal-sm'
             : 'bg-wharf-surface-primary hover:bg-wharf-surface-secondary text-wharf-text-primary',
           className
         );
@@ -158,6 +164,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         return cn(
           'p-1.5 rounded border border-wharf-border-primary select-none cursor-pointer transition-all duration-200',
           'opacity-90 sm:opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 focus-visible:opacity-100',
+          'hover:scale-105 active:scale-95',
           copied
             ? 'bg-wharf-green text-black shadow-sm !opacity-100 scale-105'
             : 'bg-wharf-surface-primary hover:bg-wharf-surface-secondary text-wharf-text-secondary',
@@ -168,6 +175,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       // icon variant
       return cn(
         'p-1.5 rounded-md border border-wharf-border-primary select-none cursor-pointer transition-all duration-200',
+        'hover:scale-105 active:scale-95',
         copied
           ? 'bg-wharf-green text-black shadow-sm'
           : 'bg-transparent hover:bg-wharf-surface-secondary text-wharf-text-secondary',
@@ -176,7 +184,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     };
 
     return (
-      <div className="relative inline-flex items-center justify-center">
+      <div className={cn('relative inline-flex items-center justify-center', variant === 'button' && 'w-full')}>
         <button
           ref={ref}
           type="button"
@@ -222,7 +230,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
 
         {/* Subtle Tooltip Confirmation ("Copied to clipboard!") */}
         <AnimatePresence>
-          {copied && (
+          {shouldShowTooltip && copied && (
             <motion.div
               initial={{ opacity: 0, y: tooltipPosition === 'top' ? 4 : -4, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -238,8 +246,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
               data-testid="copy-tooltip"
               aria-hidden="true"
             >
-              <div className="relative flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-wharf-green inline-block animate-pulse shrink-0" />
+              <div className="relative flex items-center justify-center">
                 <span>{tooltipText}</span>
                 {/* Arrow */}
                 <div
